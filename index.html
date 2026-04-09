@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ONE CASL - Universal Intake Service Blueprint</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=DM+Serif+Display:ital@0;1&display=swap');
+
+  :root {
+    --navy:    #001E60;
+    --burg:    #8A1538;
+    --red:     #EE2737;
+    --gold:    #C68937;
+    --white:   #FFFFFF;
+    --offwhite:#F6F6F4;
+    --lgray:   #E6E7E8;
+    --mgray:   #97999B;
+    --dgray:   #2D2D2D;
+    --green:   #1A6B3C;
+    --amber:   #C47D00;
+    --danger:  #C0392B;
+
+    /* layer bg */
+    --client-bg: #EDF2FF;
+    --vis-bg:    #FFF8F0;
+    --back-bg:   #F0F7F2;
+    --support-bg:#FDF5FF;
+    --gap-bg:    #FFF0F0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--offwhite);
+    color: var(--dgray);
+    min-width: 1400px;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  .header {
+    background: var(--navy);
+    padding: 28px 48px 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 4px solid var(--burg);
+  }
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--white);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .header-left p {
+    font-size: 12px;
+    color: var(--lgray);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+  .header-right {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--lgray);
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ─── MAIN GRID ──────────────────────────────────── */
+  .blueprint {
+    padding: 0 0 48px;
+  }
+
+  /* ─── PHASE HEADERS ──────────────────────────────── */
+  .phase-header-row {
+    display: grid;
+    grid-template-columns: 140px repeat(10, 1fr);
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 2px solid var(--burg);
+  }
+  .phase-corner {
+    background: #000F3A;
+    padding: 12px 10px;
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--mgray);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+  }
+  .phase-cell {
+    padding: 10px 8px 8px;
+    text-align: center;
+    border-left: 1px solid rgba(255,255,255,0.1);
+  }
+  .phase-cell .phase-num {
+    font-size: 9px;
+    color: var(--mgray);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .phase-cell .phase-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .phase-cell.arrival { border-left: 3px solid var(--burg); }
+
+  /* ─── LAYER ROWS ─────────────────────────────────── */
+  .layer-row {
+    display: grid;
+    grid-template-columns: 140px repeat(10, 1fr);
+    border-bottom: 1px solid var(--lgray);
+    min-height: 100px;
+  }
+  .layer-row:last-child { border-bottom: none; }
+
+  .layer-label {
+    padding: 14px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    border-right: 3px solid;
+    position: relative;
+  }
+  .layer-label .layer-name {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .layer-label .layer-sub {
+    font-size: 9px;
+    line-height: 1.4;
+    opacity: 0.75;
+  }
+
+  /* Layer-specific label colors */
+  .client-layer .layer-label  { background: #D8E4FF; border-color: #4A6FC1; }
+  .client-layer .layer-label .layer-name  { color: #1A3A8F; }
+  .frontstage-layer .layer-label { background: #FFF0DF; border-color: var(--gold); }
+  .frontstage-layer .layer-label .layer-name { color: #8B5200; }
+  .backstage-layer .layer-label { background: #E4F4EC; border-color: var(--green); }
+  .backstage-layer .layer-label .layer-name { color: #0D4A26; }
+  .support-layer .layer-label { background: #F5E8FF; border-color: #9B50C8; }
+  .support-layer .layer-label .layer-name { color: #5A1A8A; }
+  .gap-layer .layer-label { background: #FFE8E8; border-color: var(--danger); }
+  .gap-layer .layer-label .layer-name { color: #8B0000; }
+
+  /* Layer row backgrounds */
+  .client-layer   { background: var(--client-bg); }
+  .frontstage-layer { background: var(--vis-bg); }
+  .backstage-layer { background: var(--back-bg); }
+  .support-layer  { background: var(--support-bg); }
+  .gap-layer      { background: var(--gap-bg); }
+
+  /* Divider lines */
+  .divider-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    background: var(--navy);
+    padding: 5px 0 5px 10px;
+    align-items: center;
+  }
+  .divider-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--mgray);
+    grid-column: 1 / -1;
+    padding-left: 10px;
+  }
+  .divider-line-of-visibility .divider-label { color: var(--gold); }
+  .divider-line-of-interaction .divider-label { color: #8BC8FF; }
+
+  /* ─── CELLS ──────────────────────────────────────── */
+  .cell {
+    padding: 10px 8px;
+    border-left: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cell:first-child { border-left: none; }
+
+  .step {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 8px 9px;
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--dgray);
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: relative;
+  }
+  .step .step-title {
+    font-weight: 600;
+    font-size: 10px;
+    margin-bottom: 3px;
+    display: block;
+  }
+
+  /* Step variants */
+  .step.gap {
+    background: #FFF0F0;
+    border-color: var(--danger);
+    border-left: 3px solid var(--danger);
+  }
+  .step.gap .step-title { color: var(--danger); }
+
+  .step.friction {
+    background: #FFF8E8;
+    border-color: var(--gold);
+    border-left: 3px solid var(--gold);
+  }
+  .step.friction .step-title { color: #7A4500; }
+
+  .step.working {
+    background: #EDFAF3;
+    border-color: var(--green);
+    border-left: 3px solid var(--green);
+  }
+  .step.working .step-title { color: var(--green); }
+
+  .step.system {
+    background: #F0EAFF;
+    border-color: #9B50C8;
+    border-left: 3px solid #9B50C8;
+    font-size: 10px;
+  }
+
+  .step.note {
+    background: var(--lgray);
+    border-color: var(--mgray);
+    font-size: 9.5px;
+    color: #555;
+    font-style: italic;
+  }
+
+  /* Arrows between steps */
+  .arrow {
+    text-align: center;
+    color: var(--mgray);
+    font-size: 16px;
+    line-height: 1;
+    padding: 1px 0;
+  }
+
+  /* ─── PHASE SWIMLANE ──────────────────────────────── */
+  .phase-group {
+    border-left: 3px solid transparent;
+  }
+
+  /* ─── MILESTONE ROW ──────────────────────────────── */
+  .milestone-row {
+    display: grid;
+    grid-template-columns: 140px repeat(10, 1fr);
+    background: #F0F4FF;
+    border-top: 2px solid var(--navy);
+    border-bottom: 2px solid var(--navy);
+    padding: 8px 0;
+  }
+  .milestone-corner {
+    padding: 4px 10px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--navy);
+    display: flex;
+    align-items: center;
+  }
+  .milestone-cell {
+    padding: 4px 6px;
+    border-left: 1px solid rgba(0,30,96,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .milestone-badge {
+    background: var(--navy);
+    color: var(--white);
+    font-size: 9px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .milestone-badge.burg { background: var(--burg); }
+  .milestone-badge.gold { background: var(--gold); }
+  .milestone-badge.green { background: var(--green); }
+
+
+  /* ─── SUSTAINABILITY RISK BADGE ──────────────────────── */
+  .sustain-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 7px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #1A5F6B;
+    background: #E0F4F7;
+    border: 1px solid #1A5F6B;
+    border-radius: 3px;
+    padding: 2px 6px 2px 5px;
+    line-height: 1.4;
+  }
+  .sustain-badge::before {
+    content: '⚠';
+    font-size: 9px;
+    margin-right: 2px;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────── */
+  .footer {
+    background: var(--navy);
+    padding: 16px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer p {
+    font-size: 10px;
+    color: var(--mgray);
+  }
+  .footer .casl-mark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+    color: var(--white);
+  }
+
+  /* ─── DIVIDER LINES ──────────────────────────────── */
+  .line-row {
+    display: flex;
+    align-items: center;
+    padding: 4px 0 4px 148px;
+    gap: 8px;
+    background: transparent;
+  }
+  .line-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 2px 10px;
+    border-radius: 2px;
+  }
+  .line-line {
+    flex: 1;
+    height: 1px;
+  }
+  .line-interaction .line-label { color: #1A3A8F; background: #D8E4FF; }
+  .line-interaction .line-line { background: #4A6FC1; border-top: 2px dashed #4A6FC1; height: 0; }
+  .line-visibility .line-label { color: #8B5200; background: #FFF0DF; }
+  .line-visibility .line-line { background: var(--gold); border-top: 2px solid var(--gold); height: 0; }
+  .line-internal .line-label { color: #0D4A26; background: #E4F4EC; }
+  .line-internal .line-line { background: var(--green); border-top: 2px dashed var(--green); height: 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>ONE CASL - Universal Intake Service Blueprint</h1>
+    <p>CHINESE AMERICAN SERVICE LEAGUE (CASL)  ·  HUMAN SERVICES PILOT  ·  BENEFITS + ILLINOIS WELCOME CENTER  ·  APRIL 2026  ·  INTERNAL WORKING DOCUMENT</p>
+  </div>
+  <div class="header-right">
+    <div class="legend-item"><div class="legend-dot" style="background:#C0392B"></div>Gap / Missing</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#C68937"></div>Friction Point</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1A6B3C"></div>Working Well</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9B50C8"></div>System / Tool</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1A5F6B; border:1px solid #1A5F6B"></div>⚠ Sustainability Risk — CASL spends resources here but the client leaks out before generating a billable or reportable outcome</div>
+  </div>
+</div>
+
+<div class="blueprint">
+
+<!-- PHASE HEADER ROW -->
+<div class="phase-header-row">
+  <div class="phase-corner">STAGE</div>
+  <div class="phase-cell arrival">
+    <div class="phase-num">01</div>
+    <div class="phase-name">Arrival</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">02</div>
+    <div class="phase-name">Front Desk Registration</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">03</div>
+    <div class="phase-name">Consent Form</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">04</div>
+    <div class="phase-name">Wait for Intake Coordinator (IC)</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">05</div>
+    <div class="phase-name">Intake Assessment</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">06</div>
+    <div class="phase-name">Eligibility &amp; Routing</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">07</div>
+    <div class="phase-name">Warm Handoff</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">08</div>
+    <div class="phase-name">First Program Appt</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">09</div>
+    <div class="phase-name">Cross-Program Referral</div>
+  </div>
+  <div class="phase-cell">
+    <div class="phase-num">10</div>
+    <div class="phase-name">Follow-Up &amp; Close Loop</div>
+  </div>
+</div>
+
+<!-- ═══ CLIENT ACTIONS ═══ -->
+<div class="layer-row client-layer">
+  <div class="layer-label">
+    <span class="layer-name">Client Actions</span>
+    <span class="layer-sub">What the client does</span>
+  </div>
+
+  <!-- 01 Arrival -->
+  <div class="cell">
+    <div class="step">
+      <span class="step-title">Walk in (most common)</span>
+      No prior call. No website visit. No appointment. Arrives not knowing what CASL offers.
+    </div>
+    <div class="step friction">
+      <span class="step-title">Other entry paths</span>
+      Partner referral (Pine Tree, etc.) or phone call - no pre-intake happens in any case.
+    </div>
+  </div>
+
+  <!-- 02 Registration -->
+  <div class="cell">
+    <div class="step">
+      <span class="step-title">Gives name, DOB, contact</span>
+      Provides basic info for Salesforce registration.
+    </div>
+    <div class="step friction">
+      <span class="step-title">Confusion begins here</span>
+      Client doesn't understand why registration is needed before seeing anyone.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 03 Consent -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">Reviews + signs consent form</span>
+      English only. No explanation of why it matters. Client often doesn't understand what they're signing.
+    </div>
+  </div>
+
+  <!-- 04 Wait -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Waits in open lobby</span>
+      15-30+ min. No check-in. No coffee or water offered. No update on wait time. No sense of progress.
+    </div>
+    <div class="step friction">
+      <span class="step-title">Before 9:30 AM</span>
+      Client arrives but IC not yet available. Client is sent to program staff with no explanation.
+    </div>
+  </div>
+
+  <!-- 05 Intake -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">Answers 22 questions</span>
+      Household, income, employment, health, goals. Asked in open lobby. No privacy.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Refuses or pushes back</span>
+      "These are too personal." "Why do you need this?" Client may walk out. No language exists to respond.
+    </div>
+  </div>
+
+  <!-- 06 Eligibility -->
+  <div class="cell">
+    <div class="step">
+      <span class="step-title">Learns what they qualify for</span>
+      IC explains eligible programs. Client may not understand distinctions between programs.
+    </div>
+    <div class="step gap">
+      <span class="step-title">May be told "not eligible"</span>
+      Leaves frustrated. Tells others "don't call CASL, they won't help you." No alternative offered.
+    </div>
+  </div>
+
+  <!-- 07 Handoff -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">Handed off to program staff</span>
+      May be walked over. May be told to wait again. Unclear what happens next.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Has to repeat their story</span>
+      Program staff has not read the intake record. Client re-explains their household situation, income, and goals. The intake process served no purpose for this client.
+    </div>
+  </div>
+
+  <!-- 08 First Appt -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Meets with counselor</span>
+      When intake is read: counselor already knows the situation. Client feels seen.
+    </div>
+    <div class="step friction">
+      <span class="step-title">When intake is NOT read</span>
+      Cold start. Relationship trust takes longer. Time wasted. Client disappointed.
+    </div>
+  </div>
+
+  <!-- 09 Referral -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Learns other programs exist</span>
+      Often discovers other CASL services by accident - not by design. No proactive connection.
+    </div>
+    <div class="step friction">
+      <span class="step-title">Has to re-register</span>
+      Other programs run separate intake processes. A client who was told they would only need to tell their story once must tell it again.
+    </div>
+  </div>
+
+  <!-- 10 Follow-up -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">May not hear back</span>
+      No standard follow-up protocol. Some counselors follow up; most don't. Depends entirely on individual.
+    </div>
+    <div class="step working">
+      <span class="step-title">SMS doc reminder (when sent)</span>
+      Automated reminder for required documents is a bright spot. Reduces no-shows.
+    </div>
+  </div>
+</div>
+
+<!-- LINE OF INTERACTION -->
+<div class="line-row line-interaction">
+  <div class="line-label">- LINE OF INTERACTION (client / staff contact) -</div>
+  <div class="line-line"></div>
+</div>
+
+<!-- ═══ FRONT STAGE - STAFF ACTIONS ═══ -->
+<div class="layer-row frontstage-layer">
+  <div class="layer-label">
+    <span class="layer-name">Front Stage</span>
+    <span class="layer-sub">Staff actions visible to client</span>
+  </div>
+
+  <!-- 01 -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">Receptionist greets client</span>
+      Described in sessions as inconsistent. No standard welcome. No warmth protocol. The problem is motivation and expectation-setting, not staff capability.
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Receptionist registers in Salesforce</span>
+      Three entry paths. Registration layer launched March 3. Working as designed - but adds friction at already overloaded front desk.
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Presents consent form</span>
+      No script for explaining why. "Please sign here" only. No language for pushback. English only.
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">No hospitality during wait</span>
+      Receptionist does not offer water, check in on client, or provide wait-time updates. Not trained to. Not expected to.
+    </div>
+    <div class="step friction">
+      <span class="step-title">Routes to program staff if IC unavailable</span>
+      Happens daily before 9:30. No scripted explanation for client. No Salesforce record created for bypass.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">IC conducts intake assessment</span>
+      Winnie reads from script - not yet conversational. Takes longer than designed. Avg 10.6 min (down from ~20); daily variance 20-150 min total - process not yet stable.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+    <div class="step gap">
+      <span class="step-title">Open lobby: two problems, two timelines</span>
+      <strong>Immediate:</strong> Two chairs + defined corner available now - no budget required. Addresses privacy discomfort without waiting for construction. <strong>Permanent:</strong> Architectural booth (behind Joe brother mural) - design meeting scheduled, no completion date. Do not let the hard fix block the easy one.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Notepad workaround: design failure, not bright spot</span>
+      IC invented a fix: clients write sensitive answers (income, household) on a notepad rather than saying them aloud. It works. But it requires manual Salesforce entry after the fact - a data integrity risk. And it confirms the designed process is insufficient for a privacy-conscious, 72%-LEP (Limited English Proficiency) population. Needs to become a written protocol. If IC leaves, this fix disappears.
+    </div>
+    <div class="step gap">
+      <span class="step-title">No objection-handling language</span>
+      When client resists or questions the process, IC has no scripted response. Improvises or loses the client.
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">IC explains eligibility</span>
+      Script exists. "No dead ends" framing is good. Warm in tone when followed.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Eligibility notification ≠ enrollment conversion</span>
+      Pilot observation: clients told they qualify for additional programs respond with indifference - "okay, cool, maybe next time." Consistent with CASL's own SDOH (Social Determinants of Health) auto-referral history, where eligibility notification also failed to drive enrollment. The script needs a warm referral layer: connect eligibility to something the client said during intake. "You mentioned your utility bill - LIHEAP (Low Income Home Energy Assistance Program) covers that directly" lands differently than "you also qualify for energy assistance." Eligibility is information. A connection is Coordination.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+    <div class="step gap">
+      <span class="step-title">No script for ineligible client</span>
+      What to say when the answer is no - completely absent. Clients leave without an alternative path.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">IC coordinates handoff</span>
+      Script says "I'll walk you over." In practice: client often told to wait again or given a name without an escort.
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="cell">
+    <div class="step">
+      <span class="step-title">Program staff opens session</span>
+      Script: "I've reviewed your intake." Strong language - but only if they actually read it.
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Cross-program referral is manual</span>
+      "Persuade client to meet IC for assessment" - per ops gaps matrix. Relies on staff initiative, not system.
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">No standard follow-through protocol - confirmed by pilot data</span>
+      Six weeks of pilot data: 210 initial visits, 1 follow-up visit. This is not an inferred gap - it is a measured failure visible in the dashboard. Script says "I will follow up by ___." No system enforcement. No Salesforce field to log whether follow-up happened. 48-hour post-appointment SMS exists as infrastructure - this is a configuration decision, not a development project. Move from Phase 2 to immediate.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+</div>
+
+<!-- LINE OF VISIBILITY -->
+<div class="line-row line-visibility">
+  <div class="line-label">- LINE OF VISIBILITY (visible / not visible to client) -</div>
+  <div class="line-line"></div>
+</div>
+
+<!-- ═══ BACK STAGE - STAFF ACTIONS ═══ -->
+<div class="layer-row backstage-layer">
+  <div class="layer-label">
+    <span class="layer-name">Back Stage</span>
+    <span class="layer-sub">Staff actions not visible to client</span>
+  </div>
+
+  <!-- 01 -->
+  <div class="cell">
+    <div class="step note">Peak arrival 9 AM. 10+ clients simultaneously. 1 receptionist. Phone, buzzer, walk-ins, workshop attendees all at once.</div>
+  </div>
+
+  <!-- 02 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Salesforce contact created</span>
+      Central record begins. Three entry paths. Designed to prevent duplicate records.
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Consent stored in Salesforce</span>
+      Digital record. No physical signature required. Available to all authorized staff.
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">IC bypass: informal workaround - 75% rate</span>
+      Pilot data (Mar 3-Apr 9): 124 of 166 client records created by program staff, not IC or reception - a 75% bypass rate. These clients received their presenting service but were not assessed for additional eligibility. Cross-enrollment opportunity missed at point of highest client engagement. Root cause unconfirmed - four hypotheses: (1) privacy discomfort in open lobby; (2) upstream routing failure by reception; (3) program staff workaround behavior; (4) IC unavailability before 9:30 AM. Mo and the reception team have not been formally asked. Do not prescribe a single fix until root cause is confirmed.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Intake record built in Salesforce</span>
+      22 questions. Household, income, employment, health, goals. Feeds eligibility logic.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Refusals tracked via Teams chat</span>
+      Daily totals entered manually. No Salesforce record. No data integrity. Invisible to program staff.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Salesforce eligibility logic runs</span>
+      Auto-calculates eligible programs from intake data. Ibrahim's build. Working correctly.
+    </div>
+    <div class="step friction">
+      <span class="step-title">Editing intake = duplicate appt</span>
+      If IC edits intake record, system creates duplicate appointment. Phase 2 fix needed.
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">Salesforce appt created for program staff</span>
+      IC schedules via Salesforce. Staff notified of ownership. Notification bug resolved.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Program staff may not read record</span>
+      In the pilot, program staff skipping the intake record before a first appointment was the most commonly observed failure point. No accountability mechanism exists - no required field, no check, no tracking.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="cell">
+    <div class="step working">
+      <span class="step-title">One counselor handles all related services</span>
+      Design principle: single counselor owns all benefit services for client. Working correctly.
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Internal referral via Salesforce (when used)</span>
+      Ops gap matrix: "if client has no time, create internal referral through Salesforce." But client must be persuaded first. No automatic connection.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Referrals sitting in queue without action</span>
+      Observed in pilot: cross-program referrals created in Salesforce are not being actioned within 24 hours. The record exists; the follow-through does not. No metric tracks time-from-referral-to-contact. No owner named. This is the Commitment C gap expressed as operational data.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+    <div class="step working">
+      <span class="step-title">Enrollment causation field: exists, not activated</span>
+      A field in the Salesforce program enrollment record already captures whether an enrollment resulted from universal intake. Benefits team does not populate it consistently. Other programs don't know it exists. Activating this as a required field is the only mechanism that proves intake caused cross-enrollment - the primary outcome the pilot was designed to produce. Zero cost. Requires one training conversation + Ibrahim to set as mandatory.
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="cell">
+    <div class="step friction">
+      <span class="step-title">SMS doc reminder sent</span>
+      Automated. Sent after appointment booked. English only currently. Chinese + Spanish: Phase 2.
+    </div>
+    <div class="step gap">
+      <span class="step-title">No day-before or 1-hour reminder</span>
+      Phase 2 enhancement planned. Currently: just the required docs reminder.
+    </div>
+  </div>
+</div>
+
+<!-- LINE OF INTERNAL INTERACTION -->
+<div class="line-row line-internal">
+  <div class="line-label">- LINE OF INTERNAL INTERACTION (staff / support systems) -</div>
+  <div class="line-line"></div>
+</div>
+
+<!-- ═══ SUPPORT SYSTEMS ═══ -->
+<div class="layer-row support-layer">
+  <div class="layer-label">
+    <span class="layer-name">Support Systems</span>
+    <span class="layer-sub">Technology &amp; infrastructure</span>
+  </div>
+
+  <!-- 01 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Tools in use</span>
+      Laminated paper directory for call routing. Handwritten. Requires org-chart knowledge to use.
+    </div>
+    <div class="step gap">
+      <span class="step-title">No digital routing tool</span>
+      Digital searchable directory not yet built. Title V (Senior Community Service Employment Program) worker presses door button only.
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Salesforce Lightning</span>
+      FormAssembly for data collection. Three entry paths. Launched March 3.
+    </div>
+    <div class="step system">
+      <span class="step-title">Outlook calendar sync</span>
+      8-12 hr activation time. Must be set up day before training/go-live.
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Salesforce consent capture</span>
+      General CASL consent. Program-specific consents still handled separately per program.
+    </div>
+    <div class="step gap">
+      <span class="step-title">English only</span>
+      No Chinese or Spanish version. Phase 2: LWC (Lightning Web Component) button or S-Docs (Salesforce document generator, already licensed).
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Salesforce calendar</span>
+      IC appointment scheduling. Activity access limited to Reception + IC only (governance decision pending).
+    </div>
+    <div class="step gap">
+      <span class="step-title">No CASL holiday calendar</span>
+      Appointments can be booked on closed dates. Phase 2 fix needed.
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Salesforce intake record</span>
+      22 fields. Eligibility logic auto-runs. Centralized record available to all authorized staff.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Editing record = duplicate appt</span>
+      Phase 2: update logic to decouple edits from appointment generation.
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Eligibility engine (Salesforce)</span>
+      Matches intake data to eligible programs. Result drives routing to program staff.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Pre-populated enrollment: Phase 2</span>
+      Currently: counselors re-enter data from intake record manually. Major dev initiative required.
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Salesforce appointment + notification</span>
+      Program staff notified on ownership change (bug resolved). Intake record available on client profile.
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Salesforce contact record</span>
+      Full intake history available. One counselor manages all related benefit services for client.
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">Internal referral (Salesforce)</span>
+      Can be created when client has no time for second intake. Manual. Requires staff initiative.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Illinois Welcome Center (IWC) backup IC: governance pending</span>
+      Technically feasible. Requires cross-departmental data access decision. Not yet resolved.
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="cell">
+    <div class="step system">
+      <span class="step-title">SMS / email automation</span>
+      Required-docs reminder: live. Day-before, 1-hour, rescheduled reminders: Phase 2.
+    </div>
+    <div class="step gap">
+      <span class="step-title">Elderly clients: print only</span>
+      40% of population over 65. Cannot use SMS/email. Printable docs list: English only currently.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ONE CASL GAPS & OPPORTUNITIES ═══ -->
+<div class="layer-row gap-layer">
+  <div class="layer-label">
+    <span class="layer-name">ONE CASL Gaps &amp; Opportunities</span>
+    <span class="layer-sub">What needs to change</span>
+  </div>
+
+  <!-- 01 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Hospitality moment missing</span>
+      A warm, scripted welcome costs nothing. "We're glad you're here" + explain what will happen next. Not in any current script.
+    </div>
+  </div>
+
+  <!-- 02 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Value proposition missing</span>
+      Client needs to understand: "This registration means you won't have to repeat your story." That sentence is not said.
+    </div>
+  </div>
+
+  <!-- 03 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Consent explanation gap</span>
+      "Sign here" is not enough. Need: why this form exists, what it does for the client, and what to say if they push back.
+    </div>
+  </div>
+
+  <!-- 04 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">No Staff Contact During Lobby Wait</span>
+      Lobby wait is an experience. Currently: nothing. Opportunity: branded materials, what to expect signage, warm check-in.
+    </div>
+  </div>
+
+  <!-- 05 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">No objection-handling layer</span>
+      Scripts cover ideal path only. Every emotional state - resistant, anxious, in a hurry, lonely - needs specific language.
+    </div>
+  </div>
+
+  <!-- 06 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Ineligible client has no path</span>
+      "Not eligible" should trigger an alternative: community resource, partner referral, return path. Currently nothing.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 07 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Handoff quality is unmeasured</span>
+      "I'll walk you over" exists in the script. Whether it happens: unknown. Program staff reading intake: unknown. Needs tracking.
+    </div>
+  </div>
+
+  <!-- 08 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Whether staff read the intake record: not tracked</span>
+      The handoff from IC to program staff is where intake data most often gets skipped, and there is no measurement to confirm whether it happens. A simple Salesforce checkbox "intake reviewed" would cost nothing to build.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+
+  <!-- 09 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">"One start, many paths" not yet real</span>
+      The ONE CASL promise depends on cross-program connection being automatic, not persuasive. Architecture not built yet.
+    </div>
+  </div>
+
+  <!-- 10 -->
+  <div class="cell">
+    <div class="step gap">
+      <span class="step-title">Commitment C is unmet at close</span>
+      "Someone will contact you" in the script. Reality: no enforcement. No tracking. Clients who weren't followed up likely don't return.
+      <span class="sustain-badge">Sustainability Risk</span>
+    </div>
+  </div>
+</div>
+
+<!-- MILESTONE ROW -->
+<div class="milestone-row">
+  <div class="milestone-corner">KEY MILESTONES</div>
+  <div class="milestone-cell">
+    <div class="milestone-badge burg">Pilot Live<br>Mar 3</div>
+  </div>
+  <div class="milestone-cell"></div>
+  <div class="milestone-cell">
+    <div class="milestone-badge gold">Script<br>Revision</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge gold">Lobby<br>Protocol</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge">Objection<br>Layer</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge">Ineligible<br>Path</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge">Handoff<br>Tracking</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge green">All-Hands<br>Apr 27</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge">Phase 2<br>SF Build</div>
+  </div>
+  <div class="milestone-cell">
+    <div class="milestone-badge gold">Pulse<br>Survey 1</div>
+  </div>
+</div>
+
+</div><!-- end blueprint -->
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>ONE CASL - Universal Intake Service Blueprint  ·  Human Services Pilot  ·  April 2026  ·  100% Human LLC  ·  Internal Working Document  ·  v3</p>
+  <div class="casl-mark">CASL</div>
+</div>
+
+</body>
+</html>
